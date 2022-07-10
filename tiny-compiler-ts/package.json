@@ -1,0 +1,13 @@
+{
+  "name": "tiny-compiler-ts",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "rescript": "^9.1.4"
+  },
+  "dependencies": {
+    "@types/node": "^18.0.3",
+    "ts-node": "^10.8.2"
+  }
+}
