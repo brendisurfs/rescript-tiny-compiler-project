@@ -2,26 +2,12 @@
  *  starting off with lexical analysis: tokenizer.
  * */
 
-import { NotImplemented } from "./Types"
-
-enum CharType {
-  O_PAREN = "(",
-  C_PAREN = ")",
-  D_QUOTE = `"`,
-  NUMBER = "number",
-  STR = "string",
-  NAME = "name",
-}
-
-interface TokenType {
-  type: CharType
-  value: string
-}
+import { TokenType, CharType } from "./Types"
 
 // take our string of code and break int down into an array of tokens.
 //
 
-function tokenizer(input: string): Array<TokenType> {
+export function tokenizer(input: string): Array<TokenType> {
   // a current viarable for tracking position in the code,
   // like a cursor.
   let current = 0
