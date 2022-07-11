@@ -72,7 +72,8 @@ export function tokenizer(input: string): Array<TokenType> {
 
       while (isNumber) {
         valueString += char
-        char = input[++currentIndex] // TODO: I HATE this front ++ syntax. C was a mistake and should never have done this.
+        currentIndex++
+        char = input[currentIndex] // TODO: I HATE this front ++ syntax. C was a mistake and should never have done this.
       }
       tokens.push({ type: CharType.NUMBER, value: valueString })
       continue
