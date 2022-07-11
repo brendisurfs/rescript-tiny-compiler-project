@@ -1,10 +1,15 @@
 export enum CharType {
-  O_PAREN = "(",
-  C_PAREN = ")",
-  D_QUOTE = `"`,
+  PAREN = "paren",
+  D_QUOTE = `quote`,
   NUMBER = "number",
   STR = "string",
   NAME = "name",
+}
+
+export enum CharValue {
+  OpenParen = "(",
+  CloseParen = ")",
+  DQuote = `"`,
 }
 
 export type NotImplemented = any
@@ -15,6 +20,7 @@ export interface TokenType {
 }
 
 export enum NodeType {
+  Program = "Program",
   NumberLiteral = "NumberLiteral",
   CallExpression = "CallExpression",
 }
