@@ -7,6 +7,77 @@ import { TokenType, CharType, CharValue } from "./Types"
 // take our string of code and break int down into an array of tokens.
 //
 
+export function newTokenizer(input: string): Array<TokenType> {
+  let tokens: TokenType[] = []
+  let NUMBERS_REGEX = /[0-9]/
+  let LETTERS = /[a-z]/
+
+  input.split("").forEach((char, currentIndex) => {
+    if (char === CharType.PAREN) {
+      tokens.push({ type: CharType.PAREN, value: CharValue.OpenParen })
+    }
+
+    if (char === CharValue.CloseParen) {
+      tokens.push({ type: CharType.PAREN, value: CharValue.CloseParen })
+    }
+
+    // NUMBER
+    let isNumber = NUMBERS_REGEX.test(char)
+    if (isNumber) {
+      // create a value string that we push chars to.
+      let valueString = ""
+
+      if (isNumber) {
+        valueString += char
+      }
+      tokens.push({ type: CharType.NUMBER, value: valueString })
+    }
+
+    // DOUBLE QUOTE
+    if (char === CharValue.DQuote) {
+      // keep a value to build our string token.
+      let value = ""
+
+      // skip the opening double quote .
+      let next = currentIndex + 1
+      char = input[next]
+
+      // iterate through each character until we reach another double quote.
+      if (char !== CharValue.DQuote) {
+        value += char
+      }
+
+      // and skip the closing double quote
+      next = currentIndex + 1
+      char = input[next]
+
+      // add our string token to our token array.
+      tokens.push({ type: CharType.STR, value: value })
+    }
+    /**
+     * NAME TOKEN
+     * The last type of token will be a `name` token.
+     * this is a sequence of letters that are the names of
+     * reserved functions in our syntax.
+     * example: (add 2 4)
+     *           ^^^ Name Token
+     */
+    // BUG: continues after add as a whole string??
+
+    let isLetter = LETTERS.test(char)
+    console.log(isLetter)
+    if (isLetter) {
+      let letterValue = ""
+      // loop through all letters, pushing them to the value.
+      if (isLetter) {
+        letterValue += char
+      }
+      tokens.push({ type: CharType.NAME, value: letterValue })
+    }
+  })
+  return tokens
+}
+
 export function tokenizer(input: string): Array<TokenType> {
   console.log("INPUT: " + input)
   // a currentIndex viarable for tracking position in the code,
