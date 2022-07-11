@@ -1,4 +1,25 @@
 type token = {name: string, value: string}
+
+// makeStringFromMatch
+let makeStringFromMatch = (chars, current, break) => {
+  let stringArr = []
+  let maxLen = Js.Array.length(chars) - 1
+  while break.contents == false && current.contents < maxLen {
+    let currentChar = chars[current.contents]
+    if currentChar == " " {
+      break := true
+    } else {
+      Js.log(currentChar)
+
+      let newArr = Js.Array.push(currentChar, stringArr)
+      Js.log2("curr: ", stringArr)
+      incr(current)
+    }
+  }
+  let combinedValue = Js.Array.joinWith("", stringArr)
+  combinedValue
+}
+
 let tokenize = (input: string) => {
   let wsRegex = Js.Re.fromString("/\s/")
   let numRegex = Js.Re.fromString("/[0-9]/")
@@ -14,7 +35,6 @@ let tokenize = (input: string) => {
   let tokens = Js.Array.map(char => {
     let isNumber = Js.Re.test_(numRegex, char)
     let isLetter = Js.Re.test_(lettersRegex, char)
-    let neArr = []
     switch char {
     | "(" => {
         incr(current)
@@ -27,21 +47,8 @@ let tokenize = (input: string) => {
     | " " => {name: "space", value: char}
     | isLetter => {
         // NOTE: this needs fixing. dont quite have the handle on this yet.
-        let maxLen = Js.Array.length(chars) - 1
-        while break.contents == false && current.contents < maxLen {
-          let currentChar = chars[current.contents]
-          if currentChar == " " {
-            break := true
-          } else {
-            Js.log(currentChar)
-
-            let newArr = Js.Array.push(currentChar, neArr)
-            Js.log2("curr: ", neArr)
-            incr(current)
-          }
-        }
-        let combinedValue = Js.Array.joinWith("", neArr)
-        {name: "letter", value: combinedValue}
+        let combinedString = makeStringFromMatch(chars, current, break)
+        {name: "letter", value: combinedString}
       }
     | isNumber => {name: "number", value: char}
     | _ => {name: "", value: ""}

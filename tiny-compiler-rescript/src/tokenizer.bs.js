@@ -3,6 +3,23 @@
 
 var Caml_array = require("rescript/lib/js/caml_array.js");
 
+function makeStringFromMatch(chars, current, $$break) {
+  var stringArr = [];
+  var maxLen = chars.length - 1 | 0;
+  while($$break.contents === false && current.contents < maxLen) {
+    var currentChar = Caml_array.get(chars, current.contents);
+    if (currentChar === " ") {
+      $$break.contents = true;
+    } else {
+      console.log(currentChar);
+      stringArr.push(currentChar);
+      console.log("curr: ", stringArr);
+      current.contents = current.contents + 1 | 0;
+    }
+  };
+  return stringArr.join("");
+}
+
 function tokenize(input) {
   new RegExp("/\\s/");
   var numRegex = new RegExp("/[0-9]/");
@@ -17,7 +34,6 @@ function tokenize(input) {
   var tokens = chars.map(function ($$char) {
         numRegex.test($$char);
         lettersRegex.test($$char);
-        var neArr = [];
         switch ($$char) {
           case " " :
               return {
@@ -32,22 +48,10 @@ function tokenize(input) {
                       value: $$char
                     };
           default:
-            var maxLen = chars.length - 1 | 0;
-            while($$break.contents === false && current.contents < maxLen) {
-              var currentChar = Caml_array.get(chars, current.contents);
-              if (currentChar === " ") {
-                $$break.contents = true;
-              } else {
-                console.log(currentChar);
-                neArr.push(currentChar);
-                console.log("curr: ", neArr);
-                current.contents = current.contents + 1 | 0;
-              }
-            };
-            var combinedValue = neArr.join("");
+            var combinedString = makeStringFromMatch(chars, current, $$break);
             return {
                     name: "letter",
-                    value: combinedValue
+                    value: combinedString
                   };
         }
       });
@@ -55,5 +59,6 @@ function tokenize(input) {
   
 }
 
+exports.makeStringFromMatch = makeStringFromMatch;
 exports.tokenize = tokenize;
 /* No side effect */
