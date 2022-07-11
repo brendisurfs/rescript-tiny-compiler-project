@@ -13,7 +13,7 @@ export function newTokenizer(input: string): Array<TokenType> {
   let LETTERS = /[a-z]/
 
   input.split("").forEach((char, currentIndex) => {
-    if (char === CharType.PAREN) {
+    if (char === CharValue.OpenParen) {
       tokens.push({ type: CharType.PAREN, value: CharValue.OpenParen })
     }
 
@@ -65,15 +65,15 @@ export function newTokenizer(input: string): Array<TokenType> {
     // BUG: continues after add as a whole string??
 
     let isLetter = LETTERS.test(char)
-    console.log(isLetter)
     if (isLetter) {
       let letterValue = ""
-      // loop through all letters, pushing them to the value.
       if (isLetter) {
         letterValue += char
       }
       tokens.push({ type: CharType.NAME, value: letterValue })
     }
+    // if we have not matched any caracters, throw an error and exit.
+    throw TypeError("I dont know what this character is: " + char)
   })
   return tokens
 }
