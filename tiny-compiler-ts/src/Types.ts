@@ -3,7 +3,7 @@ export enum CharType {
   D_QUOTE = `quote`,
   NUMBER = "number",
   STR = "string",
-  NAME = "name",
+  OP = "op",
 }
 
 export enum CharValue {
@@ -23,10 +23,11 @@ export enum NodeType {
   Program = "Program",
   NumberLiteral = "NumberLiteral",
   CallExpression = "CallExpression",
+  StringLiteral = "StringLiteral",
 }
 
 export interface BaseNode {
   type: NodeType
   name: string
-  params?: Array<BaseNode>
+  params: Array<BaseNode>
 }

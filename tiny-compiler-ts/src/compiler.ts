@@ -1,3 +1,4 @@
+import { parser } from "./parser"
 import { tokenizer } from "./tokenizer_2"
 import { CharType, CharValue, NotImplemented } from "./Types"
 // NumberLiteral interface
@@ -14,8 +15,9 @@ interface Visitor {
 function main() {
   let file = "(add 2 (subtract 4 2))"
 
-  let tokensNew = tokenizer(file)
-  console.log(tokensNew)
+  let tokens = tokenizer(file)
+  let parsed = parser(tokens)
+  console.log(parsed)
 }
 
 main()
