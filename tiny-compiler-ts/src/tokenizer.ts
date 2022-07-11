@@ -1,88 +1,88 @@
-/**
- *  starting off with lexical analysis: tokenizer.
- * */
+import { CharType, TokenType } from "./Types"
 
-import { TokenType, CharType, CharValue } from "./Types"
-
-// take our string of code and break int down into an array of tokens.
-//
-
-export function newTokenizer(input: string): Array<TokenType> {
+export function tokenizer(input: string): Array<TokenType> {
+  let currentIndex = 0
+  input = input.padEnd(input.length + 1)
   let tokens: TokenType[] = []
-  let NUMBERS_REGEX = /[0-9]/
-  let LETTERS = /[a-z]/
-  let letterValue = ""
 
-  input.split("").forEach((char, currentIndex) => {
-    if (char == CharValue.OpenParen) {
-      tokens.push({ type: CharType.PAREN, value: CharValue.OpenParen })
+  while (currentIndex < input.length) {
+    let char = input[currentIndex]
+    let charNotSpace = char !== " "
+    // open paren
+    let literalRegex = /[()]/
+    if (literalRegex.test(char)) {
+      tokens.push({
+        type: CharType.PAREN,
+        value: char,
+      })
+      currentIndex++
+      continue
     }
 
-    if (char === CharValue.CloseParen) {
-      tokens.push({ type: CharType.PAREN, value: CharValue.CloseParen })
+    // whitespace check
+    if (char === " ") {
+      currentIndex++
+      continue
     }
 
-    // NUMBER
-    let isNumber = NUMBERS_REGEX.test(char)
-    if (isNumber) {
-      // create a value string that we push chars to.
-      let valueString = ""
-
-      if (isNumber) {
-        valueString += char
-      }
-      tokens.push({ type: CharType.NUMBER, value: valueString })
-    }
-
-    // DOUBLE QUOTE
-    if (char === CharValue.DQuote) {
-      // keep a value to build our string token.
+    // token numbers
+    let numberRe = /\d/
+    let isNumber = numberRe.test(char)
+    if (isNumber && currentIndex < input.length) {
       let value = ""
 
-      // skip the opening double quote .
-      let next = currentIndex + 1
-      char = input[next]
-
-      // iterate through each character until we reach another double quote.
-      if (char !== CharValue.DQuote) {
+      while (
+        isNumber &&
+        currentIndex < input.length &&
+        char !== " " &&
+        !literalRegex.test(char)
+      ) {
         value += char
+        char = input.charAt(++currentIndex)
       }
+      tokens.push({ type: CharType.NUMBER, value: value })
+      continue
+    }
 
-      // and skip the closing double quote
-      next = currentIndex + 1
-      char = input[next]
+    // check for quotes
+    //
+    if (char === `"` && currentIndex < input.length) {
+      let value = ""
+
+      // skip opening quote
+      char = input[++currentIndex]
+      while (char !== `"` && currentIndex < input.length) {
+        value += char
+        char = input[++currentIndex]
+      }
+      // skip the closing quote
+      char = input[++currentIndex]
 
       tokens.push({ type: CharType.STR, value: value })
+      continue
     }
-    /**
-     * NAME TOKEN
-     * The last type of token will be a `name` token.
-     * this is a sequence of letters that are the names of
-     * reserved functions in our syntax.
-     * example: (add 2 4)
-     *           ^^^ Name Token
-     */
 
-    let isLetter = LETTERS.test(char)
-    while (isLetter && char !== " ") {
-      console.log(" LETTER VALU: ", letterValue)
-      // BUG HERE
-      letterValue += char
-      char = input[++currentIndex]
+    // ops/strings token
+    let stringRe = /[a-z]/i
+    let isString = stringRe.test(char)
+    if (isString && currentIndex < input.length) {
+      let value = ""
+
+      while (isString && currentIndex < input.length && char !== " ") {
+        value += char
+        char = input[++currentIndex]
+      }
+
+      tokens.push({ type: CharType.NAME, value: value })
+      continue
     }
-    tokens.push({ type: CharType.NAME, value: letterValue })
-    letterValue = ""
-    // if we have not matched any caracters, throw an error and exit.
-  })
+    throw new TypeError(
+      "I dont know what this char is: " +
+        char +
+        " " +
+        "At index: " +
+        currentIndex
+    )
+  }
   return tokens
-}
-
-function handleTokenError(char: string, currentIndex: number) {
-  throw TypeError(
-    "I dont know what this character is: " +
-      char +
-      " " +
-      "at index: " +
-      currentIndex
-  )
 }

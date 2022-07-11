@@ -1,4 +1,11 @@
-import { BaseNode, CharType, CharValue, NodeType, TokenType } from "./Types"
+import {
+  BaseNode,
+  CallExpressionNode,
+  CharType,
+  CharValue,
+  NodeType,
+  TokenType,
+} from "./Types"
 
 // -------------------------------------------------------
 /**
@@ -10,7 +17,6 @@ export function parser(tokens: Array<TokenType>) {
   let current = 0
 
   // this time, we will use recursion instead of a while loop.
-  // we define a `walk` function.
   function walk() {
     // grab the current token
     let token = tokens[current]
@@ -20,7 +26,6 @@ export function parser(tokens: Array<TokenType>) {
     if (token.type === CharType.NUMBER) {
       // if we have a number token, we increment current.
       current += 1
-
       return {
         type: NodeType.NumberLiteral,
         value: token.value,
@@ -36,22 +41,18 @@ export function parser(tokens: Array<TokenType>) {
     }
     // this section looks for CallExpressions.
     // we will start with looking for open parens.
-    if (token.type === CharType.PAREN && CharValue.OpenParen) {
-      //  increment current to skip the paren,
-      //  since we dont care about it being in our AST.
+    if (token.type === "paren" && token.value === "(") {
+      //  increment current to skip the paren.
       token = tokens[++current]
-
       // create a base node with the type `CallExpression`.
       // We are going to set the namse as the current tokens value,
       // since the next token afer the open paren is the name of the fn.
 
-      let node = {
+      let node: CallExpressionNode = {
         type: NodeType.CallExpression,
         name: token.value,
-        params: [] as any,
+        params: [],
       }
-
-      // increment `current` again to skip the name token
       token = tokens[++current]
 
       // now, loop thorugh each token that will be the `params`
@@ -62,28 +63,27 @@ export function parser(tokens: Array<TokenType>) {
       // rely on recursion to resolve this.
 
       while (
-        !CharType.PAREN ||
-        (!CharValue.OpenParen && !CharValue.CloseParen)
+        token.type !== "paren" ||
+        (token.value !== "(" && token.value !== ")")
       ) {
         // we call the walk function which will return a node,
         // and we can push it into our node.params field.
         node.params.push(walk())
-        token = tokens[current]
+        token = tokens[++current]
       }
-      // we will increment to skip the closing paren.
-      current += 1
-      // and return.
+      current++
       return node
     }
 
     // if we dont recognize the token, throw an error.
-    throw new TypeError(token.type)
+
+    // throw new TypeError(JSON.stringify(token))
   }
 
   // create the AST which wil have a root of `Program` node.
   let ast = {
     type: NodeType.Program,
-    body: [],
+    body: [] as any,
   }
 
   // using our walk function, push nodes to ast.body array.
@@ -91,7 +91,7 @@ export function parser(tokens: Array<TokenType>) {
   // our program can have `CallExpression` one after another,
   // instead of being nested.
 
-  while (current < tokens.length) {
+  while (current < tokens.length - 1) {
     ast.body.push(walk())
   }
 

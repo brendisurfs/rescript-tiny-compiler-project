@@ -1,6 +1,6 @@
 import { parser } from "./parser"
-import { tokenizer } from "./tokenizer_2"
-import { CharType, CharValue, NotImplemented } from "./Types"
+import { tokenizer } from "./tokenizer"
+import { NotImplemented } from "./Types"
 // NumberLiteral interface
 interface INumberLiteral {
   enter: (node: NotImplemented, parent: NotImplemented) => void

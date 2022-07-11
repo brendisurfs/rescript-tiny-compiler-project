@@ -3,6 +3,7 @@ export enum CharType {
   D_QUOTE = `quote`,
   NUMBER = "number",
   STR = "string",
+  NAME = "name",
   OP = "op",
 }
 
@@ -30,4 +31,10 @@ export interface BaseNode {
   type: NodeType
   name: string
   params: Array<BaseNode>
+}
+
+export interface CallExpressionNode {
+  type: NodeType.CallExpression
+  name: string
+  params: any[]
 }
