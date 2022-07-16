@@ -7,7 +7,9 @@ function makeStringFromMatch(chars, current, $$break) {
   var stringsArr = [];
   while($$break.contents !== true) {
     var currentChar = Caml_array.get(chars, current.contents + 1 | 0);
-    if (currentChar === " ") {
+    var nextChar = Caml_array.get(chars, current.contents + 2 | 0);
+    console.log("nextchar: " + nextChar);
+    if (nextChar === " ") {
       $$break.contents = true;
     } else {
       current.contents = current.contents + 1 | 0;
@@ -67,7 +69,19 @@ function tokenize(input) {
                 };
         }
       });
-  console.log(tokens);
+  var onlyUppers = tokens.filter(function (v) {
+          return v.name === "upper";
+        }).reduce((function (prev, next) {
+          var comboValue = prev.value.concat(next.value);
+          return {
+                  name: "upper",
+                  value: comboValue
+                };
+        }), {
+        name: "",
+        value: ""
+      });
+  console.log(onlyUppers);
   
 }
 

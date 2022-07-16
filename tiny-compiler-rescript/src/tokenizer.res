@@ -9,17 +9,19 @@ type charType =
 // makeStringFromMatch
 let makeStringFromMatch = (chars, current, break) => {
   let stringsArr = []
+
   while break.contents != true {
     let currentChar = chars[current.contents + 1]
+    let nextChar = chars[current.contents + 2]
+    Js.log("nextchar: " ++ nextChar)
     switch true {
-    | true if currentChar == " " => break := true
+    | true if nextChar == " " => break := true
     | _ => {
         incr(current)
         let _ = stringsArr |> Js.Array.push(currentChar)
       }
     }
   }
-
   //return
   let combinedString = Js.Array.joinWith("", stringsArr)
   combinedString
@@ -45,6 +47,13 @@ let tokenize = (input: string) => {
     let isUpper = Js.Re.test_(uppercaseRegex, char)
     let isLower = Js.Re.test_(lowercaseRegex, char)
 
+    /* switch isUpper { */
+    /* | true => { */
+    /* let testingFn = makeStringFromMatch(chars, current, break) */
+    /* Js.log(" testing fn: " ++ testingFn) */
+    /* } */
+    /* | false => Js.log("false") */
+    /* } */
     // switch for char
     switch true {
     | true if char == "(" => {
@@ -72,5 +81,11 @@ let tokenize = (input: string) => {
     | _ => {name: "noop", value: ""}
     }
   }, chars)
-  Js.log(tokens)
+
+  let onlyUppers =
+    tokens |> Js.Array.filter(v => v.name == "upper") |> Js.Array.reduce((prev, next) => {
+      let comboValue = Js.String.concat(next.value, prev.value)
+      {name: "upper", value: comboValue}
+    }, {name: "", value: ""})
+  Js.log(onlyUppers)
 }
