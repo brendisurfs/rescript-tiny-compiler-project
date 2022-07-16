@@ -3,7 +3,7 @@
 
 var Tokenizer = require("./tokenizer.bs.js");
 
-Tokenizer.tokenize("(add 2 (sub 4))");
+Tokenizer.tokenize("(cool + 2) NICE");
 
 console.log("tiny compiler in rescript");
 

@@ -1,3 +1,2 @@
-let () = Tokenizer.tokenize("(add 2 (sub 4))")
+let () = Tokenizer.tokenize("(cool + 2) NICE")
 let () = Js.log("tiny compiler in rescript")
-

@@ -4,55 +4,67 @@
 var Caml_array = require("rescript/lib/js/caml_array.js");
 
 function makeStringFromMatch(chars, current, $$break) {
-  var stringArr = [];
-  var maxLen = chars.length - 1 | 0;
-  while($$break.contents === false && current.contents < maxLen) {
-    var currentChar = Caml_array.get(chars, current.contents);
+  var stringsArr = [];
+  while($$break.contents !== true) {
+    var currentChar = Caml_array.get(chars, current.contents + 1 | 0);
     if (currentChar === " ") {
       $$break.contents = true;
     } else {
-      console.log(currentChar);
-      stringArr.push(currentChar);
-      console.log("curr: ", stringArr);
       current.contents = current.contents + 1 | 0;
+      stringsArr.push(currentChar);
     }
   };
-  return stringArr.join("");
+  return stringsArr.join("");
 }
 
 function tokenize(input) {
-  new RegExp("/\\s/");
-  var numRegex = new RegExp("/[0-9]/");
-  var lettersRegex = new RegExp("/[a-z]/");
   var current = {
     contents: 0
   };
-  var $$break = {
-    contents: false
-  };
+  var wsRegex = /\s/;
+  var numRegex = /[0-9]/;
+  var lowercaseRegex = /^[a-z]/;
+  var uppercaseRegex = /^[A-Z]+$/;
   var chars = input.split("");
   var tokens = chars.map(function ($$char) {
-        numRegex.test($$char);
-        lettersRegex.test($$char);
-        switch ($$char) {
-          case " " :
-              return {
-                      name: "space",
-                      value: $$char
-                    };
-          case "(" :
-          case ")" :
-              current.contents = current.contents + 1 | 0;
-              return {
-                      name: "paren",
-                      value: $$char
-                    };
-          default:
-            var combinedString = makeStringFromMatch(chars, current, $$break);
-            return {
-                    name: "letter",
-                    value: combinedString
-                  };
+        var isNum = numRegex.test($$char);
+        var isWhitespace = wsRegex.test($$char);
+        var isUpper = uppercaseRegex.test($$char);
+        var isLower = lowercaseRegex.test($$char);
+        if ($$char === "(" || $$char === ")") {
+          current.contents = current.contents + 1 | 0;
+          return {
+                  name: "paren",
+                  value: $$char
+                };
+        } else if (isWhitespace) {
+          current.contents = current.contents + 1 | 0;
+          return {
+                  name: "space",
+                  value: $$char
+                };
+        } else if (isUpper) {
+          current.contents = current.contents + 1 | 0;
+          return {
+                  name: "upper",
+                  value: $$char
+                };
+        } else if (isLower) {
+          current.contents = current.contents + 1 | 0;
+          return {
+                  name: "lower",
+                  value: $$char
+                };
+        } else if (isNum) {
+          return {
+                  name: "number",
+                  value: $$char
+                };
+        } else {
+          return {
+                  name: "noop",
+                  value: ""
+                };
         }
       });
   console.log(tokens);

@@ -1,59 +1,76 @@
 type token = {name: string, value: string}
 
+type charType =
+  | Int(string)
+  | Upper(string)
+  | Lower(string)
+  | NoOp(string)
+
 // makeStringFromMatch
 let makeStringFromMatch = (chars, current, break) => {
-  let stringArr = []
-  let maxLen = Js.Array.length(chars) - 1
-  while break.contents == false && current.contents < maxLen {
-    let currentChar = chars[current.contents]
-    if currentChar == " " {
-      break := true
-    } else {
-      Js.log(currentChar)
-
-      let newArr = Js.Array.push(currentChar, stringArr)
-      Js.log2("curr: ", stringArr)
-      incr(current)
+  let stringsArr = []
+  while break.contents != true {
+    let currentChar = chars[current.contents + 1]
+    switch true {
+    | true if currentChar == " " => break := true
+    | _ => {
+        incr(current)
+        let _ = stringsArr |> Js.Array.push(currentChar)
+      }
     }
   }
-  let combinedValue = Js.Array.joinWith("", stringArr)
-  combinedValue
+
+  //return
+  let combinedString = Js.Array.joinWith("", stringsArr)
+  combinedString
 }
 
+// TOKENIZE -
 let tokenize = (input: string) => {
-  let wsRegex = Js.Re.fromString("/\s/")
-  let numRegex = Js.Re.fromString("/[0-9]/")
-  let lettersRegex = Js.Re.fromString("/[a-z]/")
-
+  // filtering stops
   let current = ref(0)
   let break = ref(false)
 
-  @genType
-  let tokens: array<Types.token> = []
+  let wsRegex = %re("/\s/")
+  let numRegex = %re("/[0-9]/")
+  let lowercaseRegex = %re("/^[a-z]/")
+  let uppercaseRegex = %re("/^[A-Z]+$/")
 
   let chars = Js.String.split("", input)
+
+  // start maping here
   let tokens = Js.Array.map(char => {
-    let isNumber = Js.Re.test_(numRegex, char)
-    let isLetter = Js.Re.test_(lettersRegex, char)
-    switch char {
-    | "(" => {
+    let isNum = Js.Re.test_(numRegex, char)
+    let isWhitespace = Js.Re.test_(wsRegex, char)
+    let isUpper = Js.Re.test_(uppercaseRegex, char)
+    let isLower = Js.Re.test_(lowercaseRegex, char)
+
+    // switch for char
+    switch true {
+    | true if char == "(" => {
         incr(current)
         {name: "paren", value: char}
       }
-    | ")" => {
+    | true if char == ")" => {
         incr(current)
         {name: "paren", value: char}
       }
-    | " " => {name: "space", value: char}
-    | isLetter => {
-        // NOTE: this needs fixing. dont quite have the handle on this yet.
-        let combinedString = makeStringFromMatch(chars, current, break)
-        {name: "letter", value: combinedString}
+    | true if isWhitespace => {
+        incr(current)
+        {name: "space", value: char}
       }
-    | isNumber => {name: "number", value: char}
-    | _ => {name: "", value: ""}
+    | true if isUpper => {
+        incr(current)
+        // let resValue = makeStringFromMatch(chars, current, break)
+        {name: "upper", value: char}
+      }
+    | true if isLower => {
+        incr(current)
+        {name: "lower", value: char}
+      }
+    | true if isNum => {name: "number", value: char}
+    | _ => {name: "noop", value: ""}
     }
   }, chars)
-
   Js.log(tokens)
 }
