@@ -8,16 +8,17 @@ type tokenEnum =
 let tokenizeStrings = (input: string) => {
   let current = ref(0)
   let tokens: array<tokenEnum> = []
-  let stringArray = Js.String.split("", input)
+  let inputLen = Js.String.length(input)
 
-  while current.contents < Js.String.length(input) {
-    let c = stringArray[current.contents]
-    let value = ref(c)
+  while current.contents < inputLen {
+    let stringArray = Js.String.split("", input)
+    let char = ref(stringArray[current.contents])
 
-    let isOpenParen = Js.Re.test_(%re("/\(/"), c)
-    let isCloseParen = Js.Re.test_(%re("/\)/"), c)
-    let isNumber = Js.Re.test_(%re("/^[0-9]/"), c)
-    let isWhitespace = Js.Re.test_(%re("/\s/"), c)
+    let isOpenParen = Js.Re.test_(%re("/\(/"), char.contents)
+    let isCloseParen = Js.Re.test_(%re("/\)/"), char.contents)
+    let isNumber = Js.Re.test_(%re("/^[0-9]/"), char.contents)
+    let isLetter = Js.Re.test_(%re("/^[a-z]/i"), char.contents)
+    let isWhitespace = Js.Re.test_(%re("/\s/"), char.contents)
 
     switch true {
     | true if isOpenParen => {
@@ -25,6 +26,7 @@ let tokenizeStrings = (input: string) => {
         let _ = tokens |> Js.Array.push(ParenOpen)
         Js.log(ParenOpen)
       }
+
     | true if isCloseParen => {
         incr(current)
         let _ = tokens |> Js.Array.push(ParenClose)
@@ -32,17 +34,32 @@ let tokenizeStrings = (input: string) => {
       }
 
     | true if isNumber => {
+        let value = ref("")
         let break = ref(false)
-        let isNextMatch = Js.Re.test_(%re("/^[0-9]/"), value.contents)
-        while isNextMatch && current.contents < String.length(input) {
+        while isNumber && current.contents < inputLen && break.contents != true {
+          value := value.contents ++ char.contents
           incr(current)
-          Js.log(value.contents)
+          char := stringArray[current.contents]
+          if char.contents == " " {
+            break := true
+          }
         }
+        Js.log(value)
       }
-    /* while isNumMatch == true { */
-    /* incr(current) */
-    /* value := value.contents ++ nc */
-    /* } */
+
+    | true if isLetter => {
+        let value = ref("")
+        let break = ref(false)
+        while isLetter && current.contents < inputLen && break.contents != true {
+          value := value.contents ++ char.contents
+          incr(current)
+          char := stringArray[current.contents]
+          if char.contents == " " {
+            break := true
+          }
+        }
+        Js.log(value)
+      }
 
     | true if isWhitespace => incr(current)
     | _ => {
@@ -55,20 +72,3 @@ let tokenizeStrings = (input: string) => {
 }
 
 tokenizeStrings("hello nerds 12345 ( )")
-/* let isInArray = Array.find(x => x == c, numRange) */
-/* let matchedNum = switch isInArray { */
-/* | Some(isInArray) => c */
-/* | None => "" */
-/* } */
-/* Js.log(matchedNum) */
-
-/* let matchSomeChar = Re.test_(%re("/[0-9]/"), nextChar) */
-/* while isNextChar { */
-/* switch matchSomeChar { */
-/* | true => { */
-/* Js.log("next char: " ++ nextChar) */
-/* incr(current) */
-/* } */
-/* | _ => break := true */
-/* } */
-/* } */
