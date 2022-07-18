@@ -7,44 +7,43 @@ type tokenEnum =
 
 let tokenizeStrings = (input: string) => {
   let current = ref(0)
-  let tokens: array<tokenEnum> = []
+  let tokens: array<string> = []
   let inputLen = Js.String.length(input)
 
+  Js.log(inputLen)
+
   while current.contents < inputLen {
+    Js.log("current contents")
+    Js.log(current.contents)
     let stringArray = Js.String.split("", input)
     let char = ref(stringArray[current.contents])
 
-    let isOpenParen = Js.Re.test_(%re("/\(/"), char.contents)
-    let isCloseParen = Js.Re.test_(%re("/\)/"), char.contents)
+    // let isOpenParen = Js.Re.test_(%re("/\(/"), char.contents)
+    // let isCloseParen = Js.Re.test_(%re("/\)/"), char.contents)
     let isNumber = Js.Re.test_(%re("/^[0-9]/"), char.contents)
     let isLetter = Js.Re.test_(%re("/^[a-z]/i"), char.contents)
     let isWhitespace = Js.Re.test_(%re("/\s/"), char.contents)
 
     switch true {
-    | true if isOpenParen => {
+    | true if char.contents == "(" || char.contents == ")" => {
+        let _ = Js.Array2.push(tokens, char.contents)
         incr(current)
-        let _ = tokens |> Js.Array.push(ParenOpen)
-        Js.log(ParenOpen)
-      }
-
-    | true if isCloseParen => {
-        incr(current)
-        let _ = tokens |> Js.Array.push(ParenClose)
-        Js.log(ParenOpen)
       }
 
     | true if isNumber => {
         let value = ref("")
         let break = ref(false)
-        while isNumber && current.contents < inputLen && break.contents != true {
+        while isNumber && current.contents < inputLen - 1 && break.contents != true {
           value := value.contents ++ char.contents
+
           incr(current)
           char := stringArray[current.contents]
           if char.contents == " " {
+            incr(current)
             break := true
           }
         }
-        Js.log(value)
+        let _ = Js.Array2.push(tokens, value.contents)
       }
 
     | true if isLetter => {
@@ -52,23 +51,28 @@ let tokenizeStrings = (input: string) => {
         let break = ref(false)
         while isLetter && current.contents < inputLen && break.contents != true {
           value := value.contents ++ char.contents
+
           incr(current)
           char := stringArray[current.contents]
           if char.contents == " " {
             break := true
           }
         }
-        Js.log(value)
+        let _ = Js.Array2.push(tokens, value.contents)
       }
 
-    | true if isWhitespace => incr(current)
-    | _ => {
+    | true if isWhitespace || char.contents == " " => {
+        Js.log(char)
         incr(current)
-        let _ = tokens |> Js.Array.push(NoOpt(0))
-        Js.log(NoOpt(222))
+      }
+
+    | _ => {
+        Js.log("char " ++ char.contents)
+        incr(current)
       }
     }
+    Js.log(tokens)
   }
 }
 
-tokenizeStrings("hello nerds 12345 ( )")
+tokenizeStrings("(add 222 4)")
