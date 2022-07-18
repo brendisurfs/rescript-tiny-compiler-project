@@ -10,11 +10,7 @@ let tokenizeStrings = (input: string) => {
   let tokens: array<string> = []
   let inputLen = Js.String.length(input)
 
-  Js.log(inputLen)
-
   while current.contents < inputLen {
-    Js.log("current contents")
-    Js.log(current.contents)
     let stringArray = Js.String.split("", input)
     let char = ref(stringArray[current.contents])
 
@@ -49,7 +45,7 @@ let tokenizeStrings = (input: string) => {
     | true if isLetter => {
         let value = ref("")
         let break = ref(false)
-        while isLetter && current.contents < inputLen && break.contents != true {
+        while isLetter && current.contents < inputLen - 1 && break.contents != true {
           value := value.contents ++ char.contents
 
           incr(current)
@@ -61,18 +57,12 @@ let tokenizeStrings = (input: string) => {
         let _ = Js.Array2.push(tokens, value.contents)
       }
 
-    | true if isWhitespace || char.contents == " " => {
-        Js.log(char)
-        incr(current)
-      }
+    | true if isWhitespace || char.contents == " " => incr(current)
 
-    | _ => {
-        Js.log("char " ++ char.contents)
-        incr(current)
-      }
+    | _ => incr(current)
     }
-    Js.log(tokens)
   }
+  Js.log(tokens)
 }
 
 tokenizeStrings("(add 222 4)")
